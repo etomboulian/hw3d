@@ -1,4 +1,5 @@
 #include "Mouse.h"
+#include "ChiliWin.h"
 
 std::pair<int, int> Mouse::GetPos() const noexcept
 {
@@ -13,6 +14,11 @@ int Mouse::GetPosX() const noexcept
 int Mouse::GetPosY() const noexcept
 {
 	return y;
+}
+
+bool Mouse::IsInWindow() const noexcept
+{
+	return isInWindow;
 }
 
 bool Mouse::LeftIsPressed() const noexcept
@@ -50,6 +56,20 @@ void Mouse::OnMouseMove(int newX, int newY) noexcept
 	y = newY;
 
 	buffer.push(Mouse::Event(Mouse::Event::Type::Move, *this));
+	TrimBuffer();
+}
+
+void Mouse::OnMouseLeave() noexcept
+{
+	isInWindow = false;
+	buffer.push(Mouse::Event(Mouse::Event::Type::Leave, *this));
+	TrimBuffer();
+}
+
+void Mouse::OnMouseEnter() noexcept
+{
+	isInWindow = true;
+	buffer.push(Mouse::Event(Mouse::Event::Type::Enter, *this));
 	TrimBuffer();
 }
 
@@ -98,5 +118,21 @@ void Mouse::TrimBuffer() noexcept
 	while (buffer.size() > bufferSize)
 	{
 		buffer.pop();
+	}
+}
+
+void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
+{
+	wheelDeltaCarry += delta;
+	// generate events for each 120 in wheel delta received
+	while (wheelDeltaCarry >= WHEEL_DELTA)
+	{
+		wheelDeltaCarry -= WHEEL_DELTA;
+		OnWheelUp(x, y);
+	}
+	while (wheelDeltaCarry <= -WHEEL_DELTA)
+	{
+		wheelDeltaCarry += WHEEL_DELTA;
+		OnWheelDown(x, y);
 	}
 }

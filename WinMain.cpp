@@ -1,5 +1,5 @@
 #include "Window.h"
-#include <iterator>
+#include <sstream>
 
 
 int CALLBACK WinMain(
@@ -12,14 +12,29 @@ int CALLBACK WinMain(
 		Window wnd(800, 600, "Test Window");
 		MSG msg;
 		BOOL gResult;
+		int counter = 0;
 		while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
-			if (wnd.kbd.KeyIsPressed(VK_MENU))
+			
+			while (!wnd.mouse.IsEmpty())
 			{
-				MessageBox(nullptr, "Something happened!!!", "Alt Key Pressed", 0);
+				const auto e = wnd.mouse.Read();
+				switch (e.GetType())
+				{
+				case Mouse::Event::Type::WheelUp:
+					++counter;
+					break;
+				case Mouse::Event::Type::WheelDown:
+					--counter;
+					break;									
+				}
+				std::ostringstream oss;
+				oss << ((counter > 0) ? "Up: " : "Down: ") << counter << std::endl;
+				wnd.SetTitle(oss.str());
+
 			}
 		}
 

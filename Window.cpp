@@ -39,6 +39,7 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 
 Window::Window(int width, int height, const char* name) 
+	:width(width), height(height)
 {
 	RECT wr;
 	wr.left = 100;
@@ -70,6 +71,14 @@ Window::Window(int width, int height, const char* name)
 Window::~Window()
 {
 	DestroyWindow(hWnd);
+}
+
+void Window::SetTitle(const std::string& title)
+{
+	if (SetWindowText(hWnd, title.c_str()) == 0)
+	{
+		throw CHWND_LAST_EXCEPT();
+	}
 }
 
 LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -131,8 +140,34 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		/************** Mouse Messages **********************/
 	case WM_MOUSEMOVE:
 	{
-		POINTS pt = MAKEPOINTS(lParam);
-		mouse.OnMouseMove(pt.x, pt.y);
+		const POINTS pt = MAKEPOINTS(lParam);
+		// if in client region then log move, and log enter + capture mouse 
+		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
+		{
+			mouse.OnMouseMove(pt.x, pt.y);
+			if (!mouse.IsInWindow())
+			{
+				SetCapture(hWnd);
+				mouse.OnMouseEnter();
+			}
+		}
+		// not in client -> log move / maintain capture if buttondown
+		else
+		{
+			if (wParam & (MK_LBUTTON | MK_RBUTTON))
+			{
+				mouse.OnMouseMove(pt.x, pt.y);
+			}
+			// button up - release capture / log event for leaving
+			else 
+			{
+				ReleaseCapture();
+				mouse.OnMouseLeave();
+			}
+			
+		}
+		
+		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
@@ -161,14 +196,8 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_MOUSEWHEEL:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-		{
-			mouse.OnWheelUp(pt.x, pt.y);
-		}
-		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
-		{
-			mouse.OnWheelDown(pt.x, pt.y);
-		}
+		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+		mouse.OnWheelDelta(pt.x, pt.y, delta);
 		break;
 	}
 		/************** END Mouse Messages ******************/
@@ -179,7 +208,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 // Windows Exception Class
 Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
-	:ChiliException(line, file), hr(hr)
+	:ChiliException(line, file), hr(hr)						// hr = hResult (Windows default error type)
 {
 	// empty on purpose
 }
