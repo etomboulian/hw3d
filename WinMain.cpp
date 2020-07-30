@@ -9,8 +9,7 @@ int CALLBACK WinMain(
 	int			nCmdShow)
 {
 	try {
-		Window wnd(800, 300, "Test Window");
-
+		Window wnd(800, 600, "Test Window");
 		MSG msg;
 		BOOL gResult;
 		while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
