@@ -102,9 +102,31 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 {
 	switch (msg)
 	{
-	case WM_CLOSE:
+	case WM_CLOSE:			// Win Event Message = CLOSE
 		PostQuitMessage(0);
 		return 0;
+	case WM_KILLFOCUS:		// Win Event Message = LOSE FOCUS
+		kbd.ClearState();
+		break;
+		/************** Keyboard Messages *******************/
+	case WM_KEYDOWN:		// Win Event Message = KEY DOWN
+	case WM_SYSKEYDOWN:
+		if (!(lParam & 0x40000000) || kbd.AutorepeatIsEnabled()) // check that bit 30 of lParam is 0 or if Autorepeat is enabled
+		{
+			// when windows receives a Keydown message, pass the key details to the keyboard class OnKeyPressed function
+			kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+		}
+		break;
+	case WM_KEYUP:			// Win Event Message = KEY UP
+	case WM_SYSKEYUP:
+		// when windows receives a Keyup message, pass the identity of the key to the keyboard class OnKeyRelease function
+		kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
+		break;
+	case WM_CHAR:			// Win Event Message = CHARACTER PRESS
+		// when windows receives a Char Message, pass to the keyboard class OnChar function
+		kbd.OnChar(static_cast<unsigned char>(wParam));
+		break;
+		/************** END Keyboard Messages ***************/
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
