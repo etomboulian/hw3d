@@ -1,4 +1,6 @@
-### Buliding the Chili Hardware 3D Game
+### Buliding the Chili Hardware 3D Rendering Project
 
-Project Based on video tutorial series on youtube, original final source at:
+Project Based on video tutorial series on youtube
+
+original source code at:
 https://github.com/planetchili/hw3d/tree/master/hw3d
