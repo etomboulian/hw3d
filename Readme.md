@@ -3,4 +3,4 @@
 Project Based on video tutorial series on youtube
 
 original source code at:
-https://github.com/planetchili/hw3d/tree/master/hw3d
+https://github.com/planetchili/hw3d
