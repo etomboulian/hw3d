@@ -1,5 +1,6 @@
 #include "Window.h"
 #include <sstream>
+#include "App.h"
 
 
 int CALLBACK WinMain(
@@ -9,42 +10,8 @@ int CALLBACK WinMain(
 	int			nCmdShow)
 {
 	try {
-		Window wnd(800, 600, "Test Window");
-		MSG msg;
-		BOOL gResult;
-		int counter = 0;
-		while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			
-			while (!wnd.mouse.IsEmpty())
-			{
-				const auto e = wnd.mouse.Read();
-				switch (e.GetType())
-				{
-				case Mouse::Event::Type::WheelUp:
-					++counter;
-					break;
-				case Mouse::Event::Type::WheelDown:
-					--counter;
-					break;									
-				}
-				std::ostringstream oss;
-				oss << ((counter > 0) ? "Up: " : "Down: ") << counter << std::endl;
-				wnd.SetTitle(oss.str());
-
-			}
-		}
-
-		if (gResult == -1)
-		{
-			return -1;
-		}
-
-		// wParam here is the value passed to PostQuit Message
-		return msg.wParam;
+		App a;
+		a.Go();
 	}
 	catch (const ChiliException& e)
 	{

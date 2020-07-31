@@ -22,13 +22,13 @@ public:
 		Event()
 			:type(Type::Invalid), code(0u)
 		{
-		
+			// empty on purpose
 		}
 
 		Event(Type type, unsigned char code) noexcept
 			:type(type), code(code)
 		{
-
+			// empty on purpose
 		}
 
 		bool IsPress() const noexcept
