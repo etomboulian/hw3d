@@ -43,5 +43,6 @@
 #define STRICT
 // including windows header file
 #include <Windows.h>
+#include <string>
 #endif
 

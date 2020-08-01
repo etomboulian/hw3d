@@ -9,18 +9,29 @@
 
 class Window
 {
-public: 
+public:
 	class Exception : public ChiliException
 	{
-	public: 
-		Exception(int line, const char* file, HRESULT hr) noexcept;
+		using ChiliException::ChiliException;
+	public:
+		static std::string TranslateErrorCode(HRESULT hr) noexcept;
+	};
+	class HrException : public Exception
+	{
+	public:
+		HrException(int line, const char* file, HRESULT hr) noexcept;
 		const char* what() const noexcept override;
 		virtual const char* GetType() const noexcept override;
-		static std::string TranslateErrorCode(HRESULT hr) noexcept;
 		HRESULT GetErrorCode() const noexcept;
-		std::string GetErrorString() const noexcept;
+		std::string GetErrorDescription() const noexcept;
 	private:
 		HRESULT hr;
+	};
+	class NoGfxException : public Exception
+	{
+	public:
+		using Exception::Exception;
+		const char* GetType() const noexcept override;
 	};
 private:
 	class WindowClass
@@ -60,5 +71,6 @@ private:
 };
 
 // error exception helper macro
-#define CHWND_EXCEPT( hr ) Window::Exception (__LINE__, __FILE__, hr)
-#define CHWND_LAST_EXCEPT() Window::Exception(__LINE__, __FILE__, GetLastError())
+#define CHWND_EXCEPT( hr ) Window::HrException (__LINE__, __FILE__, hr)
+#define CHWND_LAST_EXCEPT() Window::HrException(__LINE__, __FILE__, GetLastError())
+#define CHWND_NOGFX_EXCEPT() Window::NoGfxException(__LINE__, __FILE__)
