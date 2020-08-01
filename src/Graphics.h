@@ -9,10 +9,12 @@
 class Graphics
 {
 public:
+	// Bring in the Chili Exception as the parent exception to inherit
 	class Exception : public ChiliException
 	{
 		using ChiliException::ChiliException;
 	};
+	// Create HrException definition to get the result from the returned HRESULT
 	class HrException : public Exception
 	{
 	public:
@@ -23,11 +25,22 @@ public:
 		std::string GetErrorString() const noexcept;
 		std::string GetErrorDescription() const noexcept;
 		std::string GetErrorInfo() const noexcept;
-
 	private:
 		HRESULT hr;
 		std::string info;
 	};
+	// Create InfoException to get the info messages where no HRESULT is returned
+	class InfoException : public Exception
+	{
+	public:
+		InfoException(int line, const char* file, std::vector<std::string> infoMsgs) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
+		std::string GetErrorInfo() const noexcept;
+	private:
+		std::string info;
+	};
+	// Create DeviceRemovedException to handle the case that the driver fails
 	class DeviceRemovedException : public HrException
 	{
 		using HrException::HrException;
@@ -36,7 +49,7 @@ public:
 	private:
 		std::string reason;
 	};
-
+// Main Graphics class defition below:
 public:
 	Graphics(HWND hWnd);
 	Graphics(const Graphics&) = delete;			// remove the default copy constructor
@@ -44,7 +57,9 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue) noexcept;
+	void DrawTestTriangle();
 private: 
+// if we are in debug mode, include another var to hold the info messages
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
 #endif
