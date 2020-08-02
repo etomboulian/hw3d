@@ -1,7 +1,6 @@
 #include "App.h"
-#include <string>
-#include <iostream>
-
+// #define CHILI_DEBUG_MOUSE_POSITION
+// #define CHILI_DEBUG_KEYBOARD_KEYPRESSED
 
 App::App()
 	:wnd(800, 600, "Test 3D Game")
@@ -32,7 +31,7 @@ void App::DoFrame()
 		wnd.mouse.GetPosX() / 400.0f - 1.0f,
 		-wnd.mouse.GetPosY() / 300.0f + 1.0f
 	);
-	
+// Start Input debug options (mouse and keyboard)
 #ifdef CHILI_DEBUG_MOUSE_POSITION
 	std::ostringstream oss;
 	oss << "Mouse at: (" << wnd.mouse.GetPosX() << "," << wnd.mouse.GetPosY() << ")" << std::endl;
@@ -40,13 +39,14 @@ void App::DoFrame()
 #endif
 
 #ifdef CHILI_DEBUG_KEYBOARD_KEYPRESSED
-	if (!wnd.kbd.CharIsEmpty())
+	if (!wnd.kbd.CharIsEmpty()) // if key is pressed
 	{
 		std::ostringstream oss;
 		oss << "Key: " << wnd.kbd.ReadChar() << " was pressed." << std::endl;
 		OutputDebugString(oss.str().c_str());
 	}
 #endif
+// End Input debug options (mouse and keyboard)
 
 	wnd.Gfx().EndFrame();
 

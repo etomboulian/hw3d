@@ -113,25 +113,21 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		{
 			float x;
 			float y;
+			float z;
 		} pos;
-		struct
-		{
-			unsigned char r;
-			unsigned char g;
-			unsigned char b;
-			unsigned char a;
-		} color;
+				
 	};
 
 	const Vertex verticies[] =
 	{
-		{0.0f, 0.5f , 255, 0, 0, 0},		
-		{0.5f, -0.5f, 0, 255, 0, 0},		
-		{-0.5f, -0.5f, 0, 255, 255, 0},
-		{-0.3f, 0.3f, 0, 255, 0, 0},
-		{0.3f, 0.3f, 0, 255, 255, 0},
-		{0.0f, -0.8f, 255, 0, 0, 0},
-	
+		{-1.0f,		-1.0f,	-1.0f},		
+		{1.0f,		-1.0f,	-1.0f},		
+		{-1.0f,		 1.0f,	-1.0f},
+		{1.0f,		 1.0f,	-1.0f},
+		{-1.0f,		-1.0f,	 1.0f},
+		{1.0f,		-1.0f, 	 1.0f},
+		{-1.0f,		 1.0f,	 1.0f},
+		{1.0f,		 1.0f,	 1.0f},
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -157,10 +153,12 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 	// Data for Index buffer;
 	const unsigned short indicies[] =
 	{
-		0,1,2,
-		0,2,3,
-		0,4,1,
-		2,1,5,
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
 	};
 
 	// Create an index buffer and provide the required configuration
@@ -194,8 +192,9 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		dx::XMMatrixTranspose
 		(
 			dx::XMMatrixRotationZ(angle) * 
-			dx::XMMatrixScaling(3.0f / 4.0f, 1.0f, 1.0f) *
-			dx::XMMatrixTranslation( x, y, 0.0f)
+			dx::XMMatrixRotationX(angle) *
+			dx::XMMatrixTranslation( x, y, 4.0f) *
+			dx::XMMatrixPerspectiveLH( 1.0f, 3.0/4.0f, 0.5f, 10.f)
 		)
 		
 	};
@@ -217,6 +216,46 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 
 	// bind constant buffer to vertex shader
 	pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
+
+	// Create a second constant buffer about colors
+	struct ConstantBuffer2
+	{
+		struct
+		{
+			float r;
+			float g;
+			float b;
+			float a;
+		} face_colors[6];
+	};
+	// Fill the constant buffer with data
+	const ConstantBuffer2 cb2 =
+	{
+		{
+			{1.0f, 0.0f, 1.0f},
+			{1.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			{0.0f, 0.0f, 1.0f},
+			{1.0f, 1.0f, 0.0f},
+			{0.0f, 1.0f, 1.0f},
+		}
+	};
+
+	// Create the constant buffer
+	wrl::ComPtr<ID3D11Buffer> pConstantBuffer2;
+	D3D11_BUFFER_DESC cbd2;
+	cbd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd2.Usage = D3D11_USAGE_DEFAULT;
+	cbd2.CPUAccessFlags = 0u;
+	cbd2.MiscFlags = 0u;
+	cbd2.ByteWidth = sizeof(cb2);
+	cbd2.StructureByteStride = 0u;
+	D3D11_SUBRESOURCE_DATA csd2 = {};
+	csd2.pSysMem = &cb2;
+	GFX_THROW_INFO(pDevice->CreateBuffer(&cbd2, &csd2, &pConstantBuffer2));
+
+	// Bind the second constant buffer to the pixel shader
+	pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer2.GetAddressOf());
 
 	// Create pixel shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
@@ -242,21 +281,13 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		{
 			"Position",						// semantic name 
 			0,								// index of semantic
-			DXGI_FORMAT_R32G32_FLOAT,		// Format
+			DXGI_FORMAT_R32G32B32_FLOAT,		// Format
 			0,								// Input Slot
 			0,								// aligned Byte Offset
 			D3D11_INPUT_PER_VERTEX_DATA,	// Input slot class
 			0								// InstanceDataStepRate
 		},
-		{
-			"Color",						// semantic name 
-			0,								// index of semantic
-			DXGI_FORMAT_R8G8B8A8_UNORM,	// Format
-			0,								// Input Slot
-			8u,								// aligned Byte Offset
-			D3D11_INPUT_PER_VERTEX_DATA,	// Input slot class
-			0								// InstanceDataStepRate
-		},
+		
 	};
 
 	// Create the vertex input Layout
