@@ -109,13 +109,16 @@ void Graphics::DrawTestTriangle()
 	{
 		float x;
 		float y;
+		float r;
+		float g;
+		float b;
 	};
 
 	const Vertex verticies[] =
 	{
-		{ 0.0f, 0.5f },
-		{ 0.5f, -0.5f },
-		{ -0.5f, -0.5f },
+		{0.0f, 0.5f , 1.0f, 0.0f, 0.0f},		// red
+		{0.5f, -0.5f, 0.0f, 1.0f, 0.0f},		// green
+		{-0.5f, -0.5f, 0.0f, 0.0f, 1.0f},		// blue
 	
 	};
 
@@ -165,6 +168,15 @@ void Graphics::DrawTestTriangle()
 			DXGI_FORMAT_R32G32_FLOAT,		// Format
 			0,								// Input Slot
 			0,								// aligned Byte Offset
+			D3D11_INPUT_PER_VERTEX_DATA,	// Input slot class
+			0								// InstanceDataStepRate
+		},
+		{
+			"Color",						// semantic name 
+			0,								// index of semantic
+			DXGI_FORMAT_R32G32B32_FLOAT,	// Format
+			0,								// Input Slot
+			8u,								// aligned Byte Offset
 			D3D11_INPUT_PER_VERTEX_DATA,	// Input slot class
 			0								// InstanceDataStepRate
 		},
