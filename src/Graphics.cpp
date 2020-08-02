@@ -40,7 +40,7 @@ Graphics::Graphics(HWND hWnd)
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;			// Front Buffer
 	sd.BufferCount = 1;											// number of back buffers
 	sd.OutputWindow = hWnd;										// window to output to
-	sd.Windowed = TRUE;											// is Windowed
+	sd.Windowed = TRUE;	 										// is Windowed
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
@@ -52,7 +52,7 @@ Graphics::Graphics(HWND hWnd)
 	HRESULT hr;
 
 	GFX_THROW_INFO(
-		D3D11CreateDeviceAndSwapChain(
+		D3D11CreateDeviceAndSwapChain(	
 		nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE, 
 		nullptr,
@@ -64,7 +64,7 @@ Graphics::Graphics(HWND hWnd)
 		&pSwap, 
 		&pDevice, 
 		nullptr, 
-		&pContext
+		&pContext 
 		) 
 	);
 
@@ -115,7 +115,8 @@ void Graphics::DrawTestTriangle()
 	{
 		{ 0.0f, 0.5f },
 		{ 0.5f, -0.5f },
-		{ -0.5f, -0.5f }
+		{ -0.5f, -0.5f },
+	
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -133,6 +134,7 @@ void Graphics::DrawTestTriangle()
 	// Bind vertex buffer to the pipeline
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
+
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
 	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
@@ -168,6 +170,7 @@ void Graphics::DrawTestTriangle()
 		},
 	};
 
+	// Create the vertex input Layout
 	GFX_THROW_INFO(
 		pDevice->CreateInputLayout(
 			ied,

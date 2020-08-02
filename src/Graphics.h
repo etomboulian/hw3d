@@ -59,7 +59,7 @@ public:
 	void ClearBuffer(float red, float green, float blue) noexcept;
 	void DrawTestTriangle();
 private: 
-// if we are in debug mode, include another var to hold the info messages
+// if we are in debug mode, include another var to ho
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
 #endif
