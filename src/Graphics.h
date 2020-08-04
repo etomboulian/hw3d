@@ -4,10 +4,17 @@
 #include <d3d11.h>
 #include <wrl.h>
 #include <vector>
+#include "GraphicsThrowMacros.h"
 #include "DxgiInfoManager.h"
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+#include <memory>
+#include <random>
 
 class Graphics
 {
+	friend class Bindable;
+
 public:
 	// Bring in the Chili Exception as the parent exception to inherit
 	class Exception : public ChiliException
@@ -57,8 +64,12 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue) noexcept;
-	void DrawTestTriangle(float angle, float x, float y);
+	void DrawIndexed(UINT count) noexcept; // (!IS_DEBUG);
+	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+	DirectX::XMMATRIX GetProjection() const noexcept;
+
 private: 
+	DirectX::XMMATRIX projection;
 // if we are in debug mode, include another var to ho
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;

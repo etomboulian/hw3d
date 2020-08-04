@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <sstream>
 
+
 Window::WindowClass Window::WindowClass::wndClass;
 
 Window::WindowClass::WindowClass() noexcept
