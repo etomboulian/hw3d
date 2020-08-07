@@ -7,7 +7,7 @@ TransformCbuf::TransformCbuf(Graphics& gfx, const Drawable& parent)
 	{
 		pVcbuf = std::make_unique<VertexConstantBuffer<DirectX::XMMATRIX>>(gfx);
 	}
-	// empty on purpose
+	
 }
 
 void TransformCbuf::Bind(Graphics& gfx) noexcept

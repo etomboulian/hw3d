@@ -1,6 +1,7 @@
 #include "App.h"
 #include "Box.h"
 #include <memory>
+
 // #define CHILI_DEBUG_MOUSE_POSITION
 // #define CHILI_DEBUG_KEYBOARD_KEYPRESSED
 
@@ -38,7 +39,6 @@ int App::Go()
 	}
 
 }
-
 
 void App::DoFrame()
 {

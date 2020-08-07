@@ -1,7 +1,6 @@
 #include "Drawable.h"
 #include "GraphicsThrowMacros.h"
 #include "IndexBuffer.h"
-#include <cassert>
 #include <typeinfo>
 
 void Drawable::Draw(Graphics& gfx) const noexcept //(!IS_DEBUG)
@@ -10,18 +9,20 @@ void Drawable::Draw(Graphics& gfx) const noexcept //(!IS_DEBUG)
 	{
 		b->Bind(gfx);
 	}
+	for (auto& b : GetStaticBinds())
+	{
+		b->Bind(gfx);
+	}
 	gfx.DrawIndexed(pIndexBuffer->GetCount());
 }
 
 void Drawable::AddBind(std::unique_ptr<class Bindable> bind) noexcept //(!IS_DEBUG)
 {
-	assert("*Must* use AddIndexBuffer to vind index buffer" && typeid(*bind) != typeid(IndexBuffer));
 	binds.push_back(std::move(bind));
 }
 
 void Drawable::AddIndexBuffer(std::unique_ptr<class IndexBuffer> ibuf) noexcept
 {
-	assert("Attempting to add index buffer a second time" && pIndexBuffer == nullptr);
 	pIndexBuffer = ibuf.get();
 	binds.push_back(std::move(ibuf));
 }
