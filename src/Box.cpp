@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "BindableBase.h"
 #include "GraphicsThrowMacros.h"
+#include "Sphere.h"
 
 Box::Box(Graphics& gfx,
 	std::mt19937& rng,
@@ -12,30 +13,18 @@ Box::Box(Graphics& gfx,
 	dphi(odist(rng)), dtheta(odist(rng)), dchi(odist(rng)),
 	chi(adist(rng)), theta(adist(rng)), phi(adist(rng))
 {
+	namespace dx = DirectX;
+
 	if (!IsStaticInitialized()) {
 		struct Vertex
 		{
-			struct
-			{
-				float x;
-				float y;
-				float z;
-			} pos;
+			dx::XMFLOAT3 pos;
 		};
 
-		const std::vector<Vertex> verticies =
-		{
-			{-1.0f,		-1.0f,		-1.0f},
-			{ 1.0f ,	-1.0f,		-1.0f},
-			{-1.0f,		 1.0f,		-1.0f},
-			{ 1.0f,		 1.0f,		-1.0f},
-			{-1.0f,		-1.0f,		 1.0f},
-			{ 1.0f,		-1.0f,		 1.0f},
-			{-1.0f,		 1.0f,		 1.0f},
-			{ 1.0f,		 1.0f,		 1.0f},
-		};
+		auto model = Sphere::Make<Vertex>();
+		model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.0f));
 
-		AddStaticBind(std::make_unique<VertexBuffer>(gfx, verticies));
+		AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.verticies));
 
 		auto pvs = std::make_unique<VertexShader>(gfx, L"src/VertexShader.cso");
 		auto pvsbc = pvs->GetByteCode();
@@ -43,17 +32,7 @@ Box::Box(Graphics& gfx,
 
 		AddStaticBind(std::make_unique<PixelShader>(gfx, L"src/PixelShader.cso"));
 
-		const std::vector<unsigned short> indicies =
-		{
-			0,2,1, 2,3,1,
-			1,3,5, 3,7,5,
-			2,6,3, 3,6,7,
-			4,5,7, 4,7,6,
-			0,4,2, 2,4,6,
-			0,1,4, 1,5,4
-		};
-
-		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, indicies));
+		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indicies));
 
 		struct ConstantBuffer2
 		{
