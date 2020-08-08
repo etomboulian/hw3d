@@ -1,21 +1,18 @@
 #pragma once
 #include "DrawableBase.h"
 
-class Box : public DrawableBase<Box>
+class Pyramid : public DrawableBase<Pyramid>
 {
 public:
-	Box(Graphics& gfx, std::mt19937& rng,
+	Pyramid(Graphics& gfx, std::mt19937& rng,
 		std::uniform_real_distribution<float>& adist,
 		std::uniform_real_distribution<float>& ddist,
 		std::uniform_real_distribution<float>& odist,
-		std::uniform_real_distribution<float>& rdist,
-		std::uniform_real_distribution<float>& bdist
-		);
+		std::uniform_real_distribution<float>& rdist);
 	void Update(float dt) noexcept override;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-
 private:
-	// positional
+	//positional 
 	float r;
 	float roll = 0.0f;
 	float pitch = 0.0f;
@@ -23,7 +20,7 @@ private:
 	float theta;
 	float phi;
 	float chi;
-	//speed (delta/s)
+	// speed (delta/s)
 	float droll;
 	float dpitch;
 	float dyaw;
@@ -31,7 +28,5 @@ private:
 	float dphi;
 	float dchi;
 
-	// Model Transform
-	DirectX::XMFLOAT3 mt;
 };
 

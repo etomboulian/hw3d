@@ -13,7 +13,7 @@ public:
 		assert(longDiv >= 3);
 
 		const auto base = dx::XMVectorSet(1.0f, 0.0f, -1.0f, 0.0f);
-		const float logitudeAngle = 2.0f * PI / longDiv;
+		const float longitudeAngle = 2.0f * PI / longDiv;
 
 		// base verticies
 		std::vector<V> verticies;
@@ -37,7 +37,7 @@ public:
 		const auto iTip = (unsigned short)(verticies.size() - 1); 
 
 		// base indicies
-		std::vector<unsigned shrot> indicies;
+		std::vector<unsigned short> indicies;
 		for (unsigned short iLong = 0; iLong < longDiv; ++iLong)
 		{
 			indicies.push_back(iCenter);

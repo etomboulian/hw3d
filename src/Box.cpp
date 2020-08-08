@@ -1,14 +1,15 @@
 #include "Box.h"
 #include "BindableBase.h"
 #include "GraphicsThrowMacros.h"
-#include "Sphere.h"
+#include "Cube.h"
 
 Box::Box(Graphics& gfx,
 	std::mt19937& rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
-	std::uniform_real_distribution<float>& rdist)
+	std::uniform_real_distribution<float>& rdist,
+	std::uniform_real_distribution<float>& bdist)
 	: r(rdist(rng)), droll(ddist(rng)), dpitch(ddist(rng)), dyaw(ddist(rng)),
 	dphi(odist(rng)), dtheta(odist(rng)), dchi(odist(rng)),
 	chi(adist(rng)), theta(adist(rng)), phi(adist(rng))
@@ -21,20 +22,20 @@ Box::Box(Graphics& gfx,
 			dx::XMFLOAT3 pos;
 		};
 
-		auto model = Sphere::Make<Vertex>();
+		auto model = Cube::Make<Vertex>();
 		model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.0f));
 
 		AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.verticies));
 
-		auto pvs = std::make_unique<VertexShader>(gfx, L"src/VertexShader.cso");
+		auto pvs = std::make_unique<VertexShader>(gfx, L"ColorIndexVS.cso");
 		auto pvsbc = pvs->GetByteCode();
 		AddStaticBind(std::move(pvs));
 
-		AddStaticBind(std::make_unique<PixelShader>(gfx, L"src/PixelShader.cso"));
+		AddStaticBind(std::make_unique<PixelShader>(gfx, L"ColorIndexPS.cso"));
 
 		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indicies));
 
-		struct ConstantBuffer2
+		struct PixelShaderConstants
 		{
 			struct
 			{
@@ -42,13 +43,13 @@ Box::Box(Graphics& gfx,
 				float g;
 				float b;
 				float a;
-			} face_colors[6];
+			} face_colors[8];
 		};
 
-		const ConstantBuffer2 cb2 =
+		const PixelShaderConstants cb2 =
 		{
 			{
-				{ 1.0f,0.0f,1.0f },
+				{ 1.0f,1.0f,1.0f },
 				{ 1.0f,0.0f,0.0f },
 				{ 0.0f,1.0f,0.0f },
 				{ 0.0f,0.0f,1.0f },
@@ -57,7 +58,7 @@ Box::Box(Graphics& gfx,
 			}
 		};
 
-		AddStaticBind(std::make_unique<PixelConstantBuffer<ConstantBuffer2>>(gfx, cb2));
+		AddStaticBind(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb2));
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 		{
